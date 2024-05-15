@@ -82,8 +82,13 @@ class ProjectController extends AbstractController {
             return $this->json('No project found for id ' . $id, 404);
         }
 
-        $project->setName($request->request->get('name'));
-        $project->setDescription($request->request->get('description'));
+        $data = json_decode($request->getContent(), true);
+        $name = $data['name'] ?? null;
+        $description = $data['description'] ?? null;
+
+        if ($name) $project->setName($name);
+        if ($description) $project->setDescription($description);
+
         $entityManager->flush();
 
         $data =  [
