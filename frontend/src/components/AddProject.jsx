@@ -10,20 +10,26 @@ export default function AddProject() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    axios
-      .post('http://localhost:8007/api/projects', { name, description })
-      .then(res => {
-        console.log('Success:', res.data);
 
-        toast.fire({
-          icon: "success",
-          title: "Project added successfully"
-        });
-
-        navigate('/projects'); // Navigate to the project list page
+    (name == "" || description == "")
+      ? toast.fire({
+        icon: "warning",
+        title: "Please fill in all fields"
       })
-      .catch((error) => console.error('Error:', error));
-  };
+      : axios
+        .post('http://localhost:8007/api/projects', { name, description })
+        .then(res => {
+          console.log('Success:', res.data);
+
+          toast.fire({
+            icon: "success",
+            title: "Project added successfully"
+          });
+
+          navigate('/projects'); // Navigate to the project list page
+        })
+        .catch((error) => console.error('Error:', error));
+  }
 
   return (
     <form onSubmit={handleSubmit}>
