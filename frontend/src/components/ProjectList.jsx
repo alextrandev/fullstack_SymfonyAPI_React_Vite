@@ -24,8 +24,13 @@ export default function ProjectList() {
   };
 
   const handleDelete = projectId => {
-    // Need work: handle delete
-    console.log('To do: delete project with id ', projectId);
+    axios
+      .delete('http://localhost:8007/api/projects/' + projectId)
+      .then(res => {
+        console.log('Success:', res.data);
+        setProjects(projects.filter(project => project.id !== projectId))
+      })
+      .catch((error) => console.error('Error:', error));
   };
 
   return (
