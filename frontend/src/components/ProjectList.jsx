@@ -1,9 +1,41 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([]);
+
+  const editField = async (id, fieldName, fieldData) => {
+    const inputValue = fieldData;
+    const { value: editedData } = await Swal.fire({
+      title: "Edit project " + fieldName,
+      input: "text",
+      inputLabel: "Project " + fieldName,
+      inputValue,
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) return "You need to write something!";
+      }
+    });
+    if (editedData) {
+      axios
+        .put(`http://localhost:8007/api/projects/${id}`, { [fieldName]: editedData })
+        .then(res => {
+          console.log('Success:', res.data);
+          setProjects(projects.map(project =>
+            project.id === id
+              ? { ...project, [fieldName]: editedData }
+              : project
+          ));
+          Swal.fire(`Project id ${id} ${fieldName} changed to "${editedData}"`);
+        })
+        .catch(error => {
+          console.error('Error', error);
+          Swal.fire(`Something unexpected happened. Please try again!`);
+        });
+    }
+  };
 
   useEffect(() => {
     axios
@@ -17,11 +49,6 @@ export default function ProjectList() {
       })
       .catch(error => console.error('Error:', error));
   }, []);
-
-  const handleEdit = projectId => {
-    // Need work: handle edit
-    console.log('To do: edit project with id ', projectId);
-  };
 
   const handleDelete = projectId => {
     axios
@@ -47,10 +74,14 @@ export default function ProjectList() {
         <tbody>
           {projects.map(project => (
             <tr key={project.id}>
-              <td>{project.name}</td>
-              <td>{project.description}</td>
+              <td>{project.name}
+                <span onClick={() => editField(project.id, "name", project.name)} className="material-symbols-outlined">edit_square</span>
+              </td>
               <td>
-                <button onClick={() => handleEdit(project.id)}>Edit</button>
+                {project.description}
+                <span onClick={() => editField(project.id, "description", project.description)} className="material-symbols-outlined">edit_square</span>
+              </td>
+              <td>
                 <button onClick={() => handleDelete(project.id)}>Delete</button>
               </td>
             </tr>
