@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from './Toast.jsx';
 
 export default function AddProject() {
   const [name, setName] = useState('');
@@ -13,6 +14,12 @@ export default function AddProject() {
       .post('http://localhost:8007/api/projects', { name, description })
       .then(res => {
         console.log('Success:', res.data);
+
+        toast.fire({
+          icon: "success",
+          title: "Project added successfully"
+        });
+
         navigate('/projects'); // Navigate to the project list page
       })
       .catch((error) => console.error('Error:', error));

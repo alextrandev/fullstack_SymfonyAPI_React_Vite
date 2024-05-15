@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import toast from './Toast.jsx';
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -22,14 +23,20 @@ export default function ProjectList() {
         .then(res => {
           console.log('Success:', res.data);
           setProjects(projects.map(project => project.id == id ? { ...project, [fieldName]: editedData } : project));
-          Swal.fire(`Project id ${id} ${fieldName} changed to "${editedData}"`);
+          toast.fire({
+            icon: "success",
+            title: `Project id ${id} ${fieldName} changed to "${editedData}"`
+          });
         })
         .catch(error => {
           console.error('Error', error);
-          Swal.fire(`Something unexpected happened. Please try again!`);
-        });
+          toast.fire({
+            icon: "error",
+            title: "Something unexpected happened. Please try again!"
+          });
+        })
     }
-  };
+  }
 
   const deleteProject = id => {
     Swal.fire({
@@ -42,12 +49,18 @@ export default function ProjectList() {
           .delete('http://localhost:8007/api/projects/' + id)
           .then(res => {
             console.log('Success:', res.data);
-            setProjects(projects.filter(project => project.id !== id))
-            Swal.fire(`Successully delete project id ${id}?`);
+            setProjects(projects.filter(project => project.id !== id));
+            toast.fire({
+              icon: "success",
+              title: `Successully delete project id ${id}?`
+            });
           })
           .catch((error) => {
             console.error('Error:', error)
-            Swal.fire(`Something unexpected happened. Please try again!`);
+            toast.fire({
+              icon: "error",
+              title: "Something unexpected happened. Please try again!"
+            });
           })
       }
     })
