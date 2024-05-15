@@ -8,5 +8,8 @@
     "devDependencies": {
         "vite": "^5.0",
         "vite-plugin-symfony": "^6.4"
+    },
+    "dependencies": {
+        "sweetalert2": "^11.11.0"
     }
 }
