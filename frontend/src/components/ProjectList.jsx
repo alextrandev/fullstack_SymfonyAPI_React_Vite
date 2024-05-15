@@ -14,20 +14,14 @@ export default function ProjectList() {
       inputLabel: "Project " + fieldName,
       inputValue,
       showCancelButton: true,
-      inputValidator: (value) => {
-        if (!value) return "You need to write something!";
-      }
+      inputValidator: (value) => { if (!value) return "You need to write something!" }
     });
     if (editedData) {
       axios
         .put(`http://localhost:8007/api/projects/${id}`, { [fieldName]: editedData })
         .then(res => {
           console.log('Success:', res.data);
-          setProjects(projects.map(project =>
-            project.id === id
-              ? { ...project, [fieldName]: editedData }
-              : project
-          ));
+          setProjects(projects.map(project => project.id == id ? { ...project, [fieldName]: editedData } : project));
           Swal.fire(`Project id ${id} ${fieldName} changed to "${editedData}"`);
         })
         .catch(error => {
@@ -36,6 +30,28 @@ export default function ProjectList() {
         });
     }
   };
+
+  const deleteProject = id => {
+    Swal.fire({
+      title: `Do you want to delete project id ${id}?`,
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+    }).then(result => {
+      if (result.isConfirmed) {
+        axios
+          .delete('http://localhost:8007/api/projects/' + id)
+          .then(res => {
+            console.log('Success:', res.data);
+            setProjects(projects.filter(project => project.id !== id))
+            Swal.fire(`Successully delete project id ${id}?`);
+          })
+          .catch((error) => {
+            console.error('Error:', error)
+            Swal.fire(`Something unexpected happened. Please try again!`);
+          })
+      }
+    })
+  }
 
   useEffect(() => {
     axios
@@ -49,16 +65,6 @@ export default function ProjectList() {
       })
       .catch(error => console.error('Error:', error));
   }, []);
-
-  const handleDelete = projectId => {
-    axios
-      .delete('http://localhost:8007/api/projects/' + projectId)
-      .then(res => {
-        console.log('Success:', res.data);
-        setProjects(projects.filter(project => project.id !== projectId))
-      })
-      .catch((error) => console.error('Error:', error));
-  };
 
   return (
     <div className='projects_container'>
@@ -82,7 +88,7 @@ export default function ProjectList() {
                 <span onClick={() => editField(project.id, "description", project.description)} className="material-symbols-outlined">edit_square</span>
               </td>
               <td>
-                <button onClick={() => handleDelete(project.id)}>Delete</button>
+                <button onClick={() => deleteProject(project.id)}>Delete</button>
               </td>
             </tr>
           ))}
